@@ -13,7 +13,7 @@ import sys
 # Example: audio/wav
 MIMETYPE = 'audio/mp4'
 
-FIRST_API_KEY = ''
+FIRST_API_KEY = '426ede75de63902dcec1758f2825fdecf4144b73'
 
 async def main(lang1,lang2, FILE):
 
@@ -39,22 +39,23 @@ async def main(lang1,lang2, FILE):
             'buffer': audio,
             'mimetype': MIMETYPE
         }
-    detectLang = await asyncio.create_task(
-        deepgram.transcription.prerecorded(
-            source,
-            {
-                'punctuate': True,
-                'model': 'base',
-                'detect_language': True
-            }
-        )
-    )
-    domLang = detectLang['results']['channels'][0]['detected_language']
+        
+    #detectLang = await asyncio.create_task(
+    #    deepgram.transcription.prerecorded(
+    #        source,
+    #         {
+    #            'punctuate': True,
+    #            'detect_language': True
+    #        }
+    #    )
+    #)
     
-    print(domLang)
-    if domLang == lang1:
+    #domLang = detectLang['results']['channels'][0]['detected_language']
+    
+    #print(domLang)
+    #if domLang == lang1:
         print('use more other lang')
-        return
+        #return
     
     audio = open(FILE, 'rb')
     source = {
@@ -65,14 +66,15 @@ async def main(lang1,lang2, FILE):
     response = await asyncio.create_task(
         deepgram.transcription.prerecorded(
             source,
-            {
+            {   
+                'model': 'phonecall',
+                'tier': 'base',
                 'punctuate': True,
-                'model': 'base',
                 'language': lang1
             }
         )
     )
-
+    print(json.dumps(response))
     words = response['results']['channels'][0]["alternatives"][0]['words']
     for word in words:
         print(word)
@@ -90,8 +92,9 @@ async def main(lang1,lang2, FILE):
         deepgram.transcription.prerecorded(
             source,
             {
+                'model': 'phonecall',
+                'tier': 'base',
                 'punctuate': True,
-                'model': 'base',
                 'language': lang2
             }
         )
@@ -129,7 +132,7 @@ async def main(lang1,lang2, FILE):
     while i < len(combined)-1:
         
         #edit the logic of this
-        if combined[i+1]['start'] - combined[i]['start'] < .089 and languages[i] != languages[i+1]:
+        if combined[i+1]['start'] - combined[i]['start'] < .1 and languages[i] != languages[i+1]:
             if combined[i+1]['confidence'] > combined[i]['confidence']:
                 cleaned.append(combined[i+1])
             else:
