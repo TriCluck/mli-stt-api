@@ -13,7 +13,7 @@ import sys
 # Example: audio/wav
 MIMETYPE = 'audio/mp4'
 
-FIRST_API_KEY = ''
+FIRST_API_KEY = '426ede75de63902dcec1758f2825fdecf4144b73'
 
 async def main(lang1,lang2, FILE):
 
@@ -67,8 +67,8 @@ async def main(lang1,lang2, FILE):
         deepgram.transcription.prerecorded(
             source,
             {   
-                'model': 'phonecall',
-                'tier': 'base',
+                #'model': 'phonecall',
+                #'tier': 'base',
                 'punctuate': True,
                 'language': lang1
             }
@@ -92,8 +92,8 @@ async def main(lang1,lang2, FILE):
         deepgram.transcription.prerecorded(
             source,
             {
-                'model': 'phonecall',
-                'tier': 'base',
+                #'model': 'phonecall',
+                #'tier': 'base',
                 'punctuate': True,
                 'language': lang2
             }
@@ -115,24 +115,29 @@ async def main(lang1,lang2, FILE):
     for word in words:
 
         while secondIndex < len(words2) and word['start'] >= words2[secondIndex]['start']:
-            
-            combined.append(words2[secondIndex])
-            languages.append(lang2)
+            if lang2 != 'zh' or ord(words2[secondIndex]['word']) > 122:
+                combined.append(words2[secondIndex])
+                languages.append(lang2)
             secondIndex += 1
         combined.append(word)
         languages.append(lang1)
     
     if secondIndex < len(words2):
         for i in range(secondIndex, len(words2)):
-            combined.append(words2[i])
-            languages.append(lang2)
-    
+            if lang2 != 'zh' or ord(words2[i]['word']) > 122:
+                combined.append(words2[i])
+                languages.append(lang2)
+    for word in combined:
+        print(word)
     cleaned = []
     i = 0
+    lastIsCollision = False
     while i < len(combined)-1:
         
         #edit the logic of this
         if combined[i+1]['start'] - combined[i]['start'] < .1 and languages[i] != languages[i+1]:
+            if i == len(combined)-2:
+                lastIsCollision = True
             if combined[i+1]['confidence'] > combined[i]['confidence']:
                 cleaned.append(combined[i+1])
             else:
@@ -141,7 +146,8 @@ async def main(lang1,lang2, FILE):
         else:
             cleaned.append(combined[i])
         i=i+1
-    cleaned.append(combined[len(combined)-1])
+    if not lastIsCollision:
+        cleaned.append(combined[len(combined)-1])
     for word in cleaned:
         print(word['punctuated_word'], end=" ")
 
