@@ -17,7 +17,7 @@ FIRST_API_KEY = '426ede75de63902dcec1758f2825fdecf4144b73'
 
 async def main(lang1,lang2, FILE):
 
-    
+
     # Initialize the Deepgram SDK
     deepgram = Deepgram(FIRST_API_KEY)
     
@@ -39,29 +39,7 @@ async def main(lang1,lang2, FILE):
             'buffer': audio,
             'mimetype': MIMETYPE
         }
-        
-    #detectLang = await asyncio.create_task(
-    #    deepgram.transcription.prerecorded(
-    #        source,
-    #         {
-    #            'punctuate': True,
-    #            'detect_language': True
-    #        }
-    #    )
-    #)
-    
-    #domLang = detectLang['results']['channels'][0]['detected_language']
-    
-    #print(domLang)
-    #if domLang == lang1:
-        print('use more other lang')
-        #return
-    
-    audio = open(FILE, 'rb')
-    source = {
-        'buffer': audio,
-        'mimetype': MIMETYPE
-    }
+
     # Send the audio to Deepgram and get the response
     response = await asyncio.create_task(
         deepgram.transcription.prerecorded(
@@ -74,7 +52,7 @@ async def main(lang1,lang2, FILE):
             }
         )
     )
-    print(json.dumps(response))
+    
     words = response['results']['channels'][0]["alternatives"][0]['words']
     for word in words:
         print(word)
@@ -134,7 +112,6 @@ async def main(lang1,lang2, FILE):
     lastIsCollision = False
     while i < len(combined)-1:
         
-        #edit the logic of this
         if combined[i+1]['start'] - combined[i]['start'] < .1 and languages[i] != languages[i+1]:
             if i == len(combined)-2:
                 lastIsCollision = True
