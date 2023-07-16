@@ -25,7 +25,19 @@ def situations(start, start_weights, mid, mid_weights, end, end_weights, random_
     res.append(ending)
     end_weights[end.index(ending)] = 0
     return res
-    
+
+def script_generation(script, vocab, micro_situational_vocab):
+    new_list = []
+    newOne = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages = new_list
+        ) #change to davinci if needed
+    new_list.append(
+        {'role': 'user', 'content': ("Generate a script for the following script: " + script) } #fix for proper generation
+    )
+    situation = newOne.choices[0].message.content
+    gptcall(situation, vocab, micro_situational_vocab)
+    return
 
 gptcall("situation", "vocab", "micro_situational_vocab")
 while True:
